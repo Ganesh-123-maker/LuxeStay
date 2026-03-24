@@ -1,6 +1,6 @@
-# Wanderlust Web Project Installation Guide
+#  LuxeStay ✨ Web Project Installation Guide
 
-This guide will walk you through the installation process for the Wanderlust web project. Follow the steps below to set up the project locally on your machine.
+This guide will walk you through the installation process for the # LuxeStay ✨ web project. Follow the steps below to set up the project locally on your machine.
 
 ## Prerequisites
 
@@ -12,10 +12,10 @@ Before you begin, make sure you have the following installed on your system:
 
 ## Installation Steps
 
-1. Clone the Wanderlust repository from GitHub:
+1. Clone the  LuxeStay ✨ repository from GitHub:
 
    ```
-   git clone https://github.com/gawandeabhishek/Wanderlust-Major-Project.git
+   git clone https://github.com/Ganesh-123-maker/LuxeStay-Major-Project.git
    ```
 
 2. Set up the database:
@@ -23,7 +23,7 @@ Before you begin, make sure you have the following installed on your system:
    - Add the following line to the `.env` file:
 
      ```
-     ATLASDB_URL=mongodb://127.0.0.1:27017/wanderlust
+     ATLASDB_URL=mongodb://127.0.0.1:27017/LuxeStay
      ```
 
 3. Set up Cloudinary:
@@ -59,4 +59,4 @@ Before you begin, make sure you have the following installed on your system:
 7. Access the project:
    - Once the server is running, you can access the project at [http://localhost:8080](http://localhost:8080).
 
-That's it! You have successfully installed and set up the Wanderlust web project on your local machine. If you encounter any issues during the installation process, feel free to reach out for assistance. Happy traveling! 🌍✈️
+That's it! You have successfully installed and set up the LuxeStay web project on your local machine. If you encounter any issues during the installation process, feel free to reach out for assistance. Happy traveling! 🌍✈️

@@ -42,7 +42,14 @@ module.exports.createListing = async (req, res, next) => {
 
 module.exports.renderEditForm = async (req, res) => {
     let {id} = req.params;
-    const listing = await Listing.findById(id);
+    const listing = await Listing.findById(req.params.id)
+    .populate("owner")
+    .populate({
+        path: "reviews",
+        populate: {
+            path: "author"
+        }
+    });
     if(!listing) {
         req.flash("error", "Listing you requested for does not exist!");
         res.redirect("/listings");
