@@ -1,0 +1,33 @@
+# Render (recommended for production — see README "Deployment" for why).
+# A long-lived web service avoids serverless cold starts, function timeouts
+# on uploads, and per-invocation DB reconnects.
+services:
+  - type: web
+    name: luxestay
+    env: node
+    plan: free
+    buildCommand: npm ci
+    startCommand: node app.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URL
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: CLOUD_NAME
+        sync: false
+      - key: CLOUD_API_KEY
+        sync: false
+      - key: CLOUD_API_SECRET
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false

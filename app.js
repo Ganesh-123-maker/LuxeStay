@@ -28,24 +28,26 @@ const adminRouter = require("./routes/admin.js");
 
 const isProduction = process.env.NODE_ENV === "production";
 
-async function start() {
-    const dbUrl = process.env.MONGO_URL;
-    if (!dbUrl) {
-        // Fail fast with a clear message, and never print the URL itself.
-        throw new Error("MONGO_URL is not set. Copy .env.example to .env and set MONGO_URL, then restart.");
+// ---- Cached Mongoose connection (required for serverless / Vercel) ----
+// Reused across warm invocations; without this every cold start would open
+// a new connection and sessions/queries would race the connect.
+let connectPromise = null;
+async function ensureDb(dbUrl) {
+    if (mongoose.connection.readyState === 1) return;
+    if (!connectPromise) {
+        connectPromise = mongoose.connect(dbUrl).catch((err) => {
+            connectPromise = null;
+            throw err;
+        });
     }
-    const sessionSecret = process.env.SESSION_SECRET;
-    if (!sessionSecret) {
-        if (isProduction) {
-            throw new Error("SESSION_SECRET is not set. Refusing to start in production without a session secret.");
-        }
-        console.warn("WARNING: SESSION_SECRET is not set. Using a dev-only secret — never use this in production.");
-    }
+    return connectPromise;
+}
 
-    // Await the DB BEFORE listening. Previously main() was not awaited, so
-    // the server printed "running" and then every route hung on buffering.
-    await mongoose.connect(dbUrl);
-    console.log("Connected to DB");
+// ---- App wiring, run exactly once per process ----
+let configured = false;
+function configureApp(dbUrl, sessionSecret) {
+    if (configured) return app;
+    configured = true;
 
     app.set("view engine", "ejs");
     app.set("views", path.join(__dirname, "views"));
@@ -80,6 +82,8 @@ async function start() {
     app.use(methodOverride("_method"));
     app.use(express.static(path.join(__dirname, "/public")));
 
+    // Sessions live in Mongo (connect-mongo), never in process memory, so a
+    // serverless cold start or a Render restart does not log users out.
     const store = MongoStore.create({ mongoUrl: dbUrl, touchAfter: 24 * 3600 });
     store.on("error", (err) => console.error("SESSION STORE ERROR:", err.message));
 
@@ -133,7 +137,27 @@ async function start() {
         };
         res.status(statusCode).render("error.ejs", { err: safeErr });
     });
+    return app;
+}
 
+async function start() {
+    const dbUrl = process.env.MONGO_URL;
+    if (!dbUrl) {
+        // Fail fast with a clear message, and never print the URL itself.
+        throw new Error("MONGO_URL is not set. Copy .env.example to .env and set MONGO_URL, then restart.");
+    }
+    const sessionSecret = process.env.SESSION_SECRET;
+    if (!sessionSecret) {
+        if (isProduction) {
+            throw new Error("SESSION_SECRET is not set. Refusing to start in production without a session secret.");
+        }
+        console.warn("WARNING: SESSION_SECRET is not set. Using a dev-only secret — never use this in production.");
+    }
+    // Await the DB BEFORE listening. Previously main() was not awaited, so
+    // the server printed "running" and then every route hung on buffering.
+    await ensureDb(dbUrl);
+    console.log("Connected to DB");
+    configureApp(dbUrl, sessionSecret);
     const port = process.env.PORT || 3000;
     app.listen(port, () => console.log(`Server is running on port ${port}`));
 }
@@ -145,4 +169,4 @@ if (require.main === module) {
     });
 }
 
-module.exports = app;
+module.exports = { app, configureApp, ensureDb };
