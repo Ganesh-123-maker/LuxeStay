@@ -397,3 +397,51 @@ img {
 .navbar .nav-link.login:hover {
   text-decoration: underline;
 }
+/* ---- Premium UI pass (mobile-first, systematic) ---- */
+:root {
+  --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem;
+  --space-4: 1rem; --space-6: 1.5rem; --space-8: 2rem;
+}
+body { line-height: 1.6; }
+h1, h2, h3, h4 { letter-spacing: -0.01em; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid var(--red); outline-offset: 2px;
+}
+.top-bar { padding: var(--space-4) var(--space-2); border-radius: var(--radius); }
+.top-bar .form-control, .top-bar .form-select { border-radius: 0.5rem; }
+.listing-card { transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease); }
+.listing-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+.listing-img { height: 200px; object-fit: cover; }
+/* Skeleton: shimmer behind each listing image until it loads/errors. */
+.img-skeleton {
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(100deg, #eee 30%, #f7f7f7 50%, #eee 70%);
+  background-size: 200% 100%; animation: skeleton-shimmer 1.4s infinite;
+}
+.img-skeleton.loaded { display: none; }
+.listing-img { position: relative; z-index: 2; }
+@keyframes skeleton-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .img-skeleton { animation: none; } }
+/* Persisted wishlist heart: a real form button, not a decorative icon. */
+.wishlist-form { position: absolute; top: 10px; right: 12px; z-index: 3; margin: 0; }
+.wishlist-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 2.25rem; height: 2.25rem; border-radius: 50%; border: none;
+  background: rgba(0,0,0,0.45); color: #fff; font-size: 1.25rem; line-height: 1;
+  text-decoration: none; cursor: pointer;
+}
+.wishlist-btn:hover { background: rgba(0,0,0,0.65); color: #fff; }
+.wishlist-link { position: absolute; top: 10px; right: 12px; z-index: 3; }
+.badge-demo {
+  display: inline-block; background: #fff3cd; color: #664d03;
+  border: 1px solid #ffecb5; border-radius: 0.5rem; padding: 0.1rem 0.5rem; font-size: 0.8rem;
+}
+/* Mobile-first: cards stack full-width, search form stacks, show page un-offsets. */
+@media (max-width: 767px) {
+  .top-bar { padding: var(--space-3) 0; }
+  .listing-img { height: 180px; }
+  .card-body { padding: var(--space-3); }
+}
+@media (min-width: 1024px) {
+  .listing-img { height: 220px; }
+}

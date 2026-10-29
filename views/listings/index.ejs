@@ -62,23 +62,31 @@
 
 <div class="row mt-4 justify-content-center g-4">
   <% for (let listing of allListings) { %>
-    <div class="col-lg-4 col-md-6 col-sm-10">
-      <a href="/listings/<%= listing._id %>" class="listing-link">
-        <div class="card listing-card">
-          <div class="image-container">
-            <img src="<%= listing.image && listing.image.url ? listing.image.url : "" %>" class="card-img-top" alt="<%= listing.title %>">
-          </div>
-          <div class="card-body">
-            <div class="card-top">
-              <h6 class="location"><%= listing.location %>, <%= listing.country %></h6>
-              <span class="rating"><%= listing.avgRating ? "⭐ " + listing.avgRating : "No reviews yet" %></span>
-            </div>
-            <p class="title"><%= listing.title %></p>
-            <p class="text-muted small"><%= listing.category || "" %> · up to <%= listing.guests %> guests<% if (listing.amenities && listing.amenities.length) { %> · <%= listing.amenities.join(", ") %><% } %></p>
-            <p class="price">₹ <%= listing.price.toLocaleString("en-IN") %> / night <span class="tax-info"> +18% GST</span></p>
-          </div>
+    <div class="col-12 col-md-6 col-lg-4">
+      <article class="card listing-card h-100">
+        <div class="image-container">
+          <div class="img-skeleton" aria-hidden="true"></div>
+          <a href="/listings/<%= listing._id %>" aria-label="View <%= listing.title %>">
+            <img src="<%= listing.image && listing.image.url ? listing.image.url : "" %>" class="card-img-top listing-img" alt="<%= listing.title %>" loading="lazy" onload="this.closest('.image-container').querySelector('.img-skeleton').classList.add('loaded')" onerror="this.closest('.image-container').querySelector('.img-skeleton').classList.add('loaded')">
+          </a>
+          <% if (currUser) { %>
+            <form action="/listings/<%= listing._id %>/wishlist" method="POST" class="wishlist-form">
+              <button type="submit" class="wishlist-btn" aria-label="<%= wishlistIds && wishlistIds.has(listing._id.toString()) ? 'Remove from wishlist' : 'Save to wishlist' %>"><%= wishlistIds && wishlistIds.has(listing._id.toString()) ? "♥" : "♡" %></button>
+            </form>
+          <% } else { %>
+            <a href="/login" class="wishlist-btn wishlist-link" aria-label="Log in to save to wishlist">♡</a>
+          <% } %>
         </div>
-      </a>
+        <div class="card-body">
+          <div class="card-top">
+            <h6 class="location"><%= listing.location %>, <%= listing.country %></h6>
+            <span class="rating"><%= listing.avgRating ? "⭐ " + listing.avgRating : "No reviews yet" %></span>
+          </div>
+          <p class="title"><a href="/listings/<%= listing._id %>" class="listing-link"><%= listing.title %></a></p>
+          <p class="text-muted small"><%= listing.category || "" %> · up to <%= listing.guests %> guests<% if (listing.amenities && listing.amenities.length) { %> · <%= listing.amenities.join(", ") %><% } %></p>
+          <p class="price">₹ <%= listing.price.toLocaleString("en-IN") %> / night <span class="text-muted small">+ 18% GST</span></p>
+        </div>
+      </article>
     </div>
   <% } %>
 </div>
