@@ -1,135 +1,95 @@
 <% layout("/layouts/boilerplate") %>
 
 <div class="top-bar">
-
-  <div class="search-bar">
-    <span>Anywhere</span>
-    <span>Any week</span>
-    <span>Add guests</span>
-    <span class="search-icon">
-      <i class="fa-solid fa-magnifying-glass"></i>
-    </span>
-  </div>
-
-  <div class="category-bar">
-
-    <div class="categories-scroll">
-      <div class="category active">
-        <i class="fa-solid fa-city"></i>
-        <p>City</p>
-      </div>
-
-      <div class="category">
-        <i class="fa-solid fa-tree"></i>
-        <p>Nature</p>
-      </div>
-
-      <div class="category">
-        <i class="fa-regular fa-snowflake"></i>
-        <p>Arctic</p>
-      </div>
-
-      <div class="category">
-        <i class="fa-brands fa-fort-awesome"></i>
-        <p>Castle</p>
-      </div>
-
-      <div class="category">
-        <i class="fa-solid fa-ship"></i>
-        <p>Boats</p>
-      </div>
-
-      <div class="category">
-        <i class="fa-solid fa-water"></i>
-        <p>Amazing pools</p>
-      </div>
+  <form action="/listings" method="GET" class="row g-2 align-items-end">
+    <div class="col-md-3">
+      <label class="form-label" for="q">Search</label>
+      <input class="form-control" type="text" id="q" name="q" value="<%= filters.q %>" placeholder="Title, city or country">
     </div>
-
-    <div class="category-actions">
-      <button class="filter-btn">
-        <i class="fa-solid fa-sliders"></i> Filters
-      </button>
-
-      <div class="tax-toggle">
-        <span>Display total after taxes</span>
-        <input type="checkbox" id="flexSwitchCheckDefault">
-      </div>
+    <div class="col-md-2">
+      <label class="form-label" for="location">Location</label>
+      <input class="form-control" type="text" id="location" name="location" value="<%= filters.location %>" placeholder="e.g. Jaipur">
     </div>
-
-  </div>
-
-  <div class="search-box">
-    <input type="text" id="searchInput" placeholder="Search listings...">
-  </div>
-
+    <div class="col-md-1">
+      <label class="form-label" for="minPrice">Min ₹</label>
+      <input class="form-control" type="number" id="minPrice" name="minPrice" value="<%= filters.minPrice %>" min="0">
+    </div>
+    <div class="col-md-1">
+      <label class="form-label" for="maxPrice">Max ₹</label>
+      <input class="form-control" type="number" id="maxPrice" name="maxPrice" value="<%= filters.maxPrice %>" min="0">
+    </div>
+    <div class="col-md-1">
+      <label class="form-label" for="guests">Guests</label>
+      <input class="form-control" type="number" id="guests" name="guests" value="<%= filters.guests %>" min="1">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label" for="category">Category</label>
+      <select class="form-select" id="category" name="category">
+        <option value="">All categories</option>
+        <% for (const c of CATEGORIES) { %>
+          <option value="<%= c %>" <%= filters.category === c ? "selected" : "" %>><%= c %></option>
+        <% } %>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label" for="sort">Sort</label>
+      <select class="form-select" id="sort" name="sort">
+        <option value="newest" <%= filters.sort === "newest" ? "selected" : "" %>>Newest</option>
+        <option value="priceAsc" <%= filters.sort === "priceAsc" ? "selected" : "" %>>Price: low to high</option>
+        <option value="priceDesc" <%= filters.sort === "priceDesc" ? "selected" : "" %>>Price: high to low</option>
+      </select>
+    </div>
+    <div class="col-12">
+      <span class="form-label d-block">Amenities</span>
+      <% for (const a of AMENITIES) { %>
+        <label class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" name="amenity" value="<%= a %>" <%= filters.amenity.includes(a) ? "checked" : "" %>> <%= a %>
+        </label>
+      <% } %>
+      <button class="btn btn-dark ms-2" type="submit">Search</button>
+      <a class="btn btn-outline-secondary" href="/listings">Clear</a>
+    </div>
+  </form>
 </div>
 
+<p class="mt-3 text-muted"><%= total %> listing(s) found<% if (totalPages > 1) { %> — page <%= page %> of <%= totalPages %><% } %></p>
+
+<% if (allListings.length === 0) { %>
+  <div class="alert alert-info mt-3" role="alert">
+    No listings match your filters. Try widening the price range or clearing a filter, or <a href="/listings/new">create a listing</a>.
+  </div>
+<% } %>
 
 <div class="row mt-4 justify-content-center g-4">
-  <% for(let listing of allListings) { %>
-
-    <div class="col-lg-4 col-md-6 col-sm-10 listing-item"
-         data-title="<%= listing.title.toLowerCase() %>">
-
+  <% for (let listing of allListings) { %>
+    <div class="col-lg-4 col-md-6 col-sm-10">
       <a href="/listings/<%= listing._id %>" class="listing-link">
-
         <div class="card listing-card">
-
           <div class="image-container">
-            <img src="<%= listing.image.url %>" class="card-img-top">
-
-            <div class="wishlist-icon">
-              <i class="fa-regular fa-heart"></i>
-            </div>
+            <img src="<%= listing.image && listing.image.url ? listing.image.url : "" %>" class="card-img-top" alt="<%= listing.title %>">
           </div>
-
           <div class="card-body">
-
             <div class="card-top">
-              <h6 class="location">
-                <%= listing.location %>, <%= listing.country %>
-              </h6>
-              <span class="rating">⭐ 4.8</span>
+              <h6 class="location"><%= listing.location %>, <%= listing.country %></h6>
+              <span class="rating"><%= listing.avgRating ? "⭐ " + listing.avgRating : "No reviews yet" %></span>
             </div>
-
             <p class="title"><%= listing.title %></p>
-
-            <p class="price">
-              ₹ <%= listing.price.toLocaleString("en-IN") %> / night
-              <span class="tax-info"> +18% GST</span>
-            </p>
-
+            <p class="text-muted small"><%= listing.category || "" %> · up to <%= listing.guests %> guests<% if (listing.amenities && listing.amenities.length) { %> · <%= listing.amenities.join(", ") %><% } %></p>
+            <p class="price">₹ <%= listing.price.toLocaleString("en-IN") %> / night <span class="tax-info"> +18% GST</span></p>
           </div>
-
         </div>
-
       </a>
-
     </div>
-
   <% } %>
 </div>
 
-
-<script>
-const taxSwitch = document.getElementById("flexSwitchCheckDefault");
-
-taxSwitch.addEventListener("click", () => {
-  let taxInfo = document.getElementsByClassName("tax-info");
-  for (let info of taxInfo) {
-    info.style.display = info.style.display === "inline" ? "none" : "inline";
-  }
-});
-
-const searchInput = document.getElementById("searchInput");
-const items = document.querySelectorAll(".listing-item");
-
-searchInput.addEventListener("input", () => {
-  let val = searchInput.value.toLowerCase();
-
-  items.forEach(item => {
-    let title = item.dataset.title;
-    item.style.display = title.includes(val) ? "block" : "none";
-  });
-});
-</script>
+<% if (totalPages > 1) { %>
+  <nav aria-label="Listing pages" class="mt-4">
+    <ul class="pagination justify-content-center">
+      <% const base = "/listings?" + new URLSearchParams({ q: filters.q, location: filters.location, minPrice: filters.minPrice, maxPrice: filters.maxPrice, guests: filters.guests, category: filters.category, sort: filters.sort }).toString() + (filters.amenity.map(a => "&amenity=" + encodeURIComponent(a)).join("")); %>
+      <% if (page > 1) { %><li class="page-item"><a class="page-link" href="<%= base %>&page=<%= page - 1 %>">Previous</a></li><% } %>
+      <li class="page-item disabled"><span class="page-link">Page <%= page %> of <%= totalPages %></span></li>
+      <% if (page < totalPages) { %><li class="page-item"><a class="page-link" href="<%= base %>&page=<%= page + 1 %>">Next</a></li><% } %>
+    </ul>
+  </nav>
+<% } %>

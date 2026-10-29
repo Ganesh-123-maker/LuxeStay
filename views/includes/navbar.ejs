@@ -1,50 +1,27 @@
-<style>
-  .search-btn {
-    background-color: #fe424d;
-    color: #fff;
-    border-radius: 25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-inline: 1rem;
-  }
-  .search-btn:hover {
-    background-color: #fe424d;
-    color: #fff;
-  }
-
-  .search-btn i {
-    display: inline;
-    margin-right: 0.5rem;
-  }
-
-  .search-inp {
-    border-radius: 25px;
-    padding: 0.5rem 3rem;
-    font-size: 1rem;
-  }
-</style>
-
 <nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
   <div class="container-fluid">
     <a class="navbar-brand" href="/listings"><i class="fa-regular fa-compass"></i></a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
         <a class="nav-link" href="/listings">LuxeStay</a>
       </div>
-
       <div class="navbar-nav ms-auto">
         <a class="nav-link" href="/listings/new">Rent Home</a>
-
         <% if(!locals.currUser) { %>
           <a class="nav-link signup" href="/signup">Sign Up</a>
-          <a class="nav-link login" href="/login">Login</a>        <% } else { %>
-          <a class="nav-link" href="/logout"><b>Logout</b></a>
+          <a class="nav-link login" href="/login">Login</a>
+        <% } else { %>
+          <a class="nav-link" href="/trips">My Trips</a>
+          <a class="nav-link" href="/wishlist">Wishlist</a>
+          <a class="nav-link" href="/dashboard">Host Dashboard</a>
+          <% if(currUser.role === "admin") { %><a class="nav-link" href="/admin">Admin</a><% } %>
+          <form action="/logout" method="POST" class="d-inline">
+            <button type="submit" class="nav-link btn btn-link"><b>Logout</b></button>
+          </form>
         <% } %>
-
       </div>
     </div>
   </div>

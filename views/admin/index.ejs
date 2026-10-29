@@ -1,0 +1,13 @@
+<% layout("/layouts/boilerplate") %>
+<div class="row mt-3">
+  <div class="col-8 offset-2">
+    <h3>Admin</h3>
+    <p>Users: <b><%= userCount %></b> · Listings: <b><%= listingCount %></b> · Bookings: <b><%= bookingCount %></b></p>
+    <ul>
+      <li><a href="/admin/users">Manage users</a></li>
+      <li><a href="/admin/listings">Moderate listings</a></li>
+      <li><a href="/admin/bookings">Moderate bookings</a></li>
+    </ul>
+    <p class="text-muted small">Admin pages are restricted to users with role <code>admin</code> (see seed script).</p>
+  </div>
+</div>

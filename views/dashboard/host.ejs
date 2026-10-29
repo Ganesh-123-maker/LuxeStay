@@ -1,0 +1,34 @@
+<% layout("/layouts/boilerplate") %>
+<div class="row mt-3">
+  <div class="col-10 offset-1">
+    <h3>Host Dashboard</h3>
+    <p class="text-muted">Earnings from confirmed + completed bookings: <b>₹<%= earnings.toLocaleString("en-IN") %></b></p>
+    <h4 class="mt-4">My listings (<%= listings.length %>)</h4>
+    <% if (listings.length === 0) { %><p class="text-muted">No listings yet. <a href="/listings/new">Create one</a>.</p><% } %>
+    <ul>
+      <% for (const l of listings) { %>
+        <li><a href="/listings/<%= l._id %>"><%= l.title %></a> — <%= l.location %>, <%= l.country %> — ₹<%= l.price.toLocaleString("en-IN") %>/night</li>
+      <% } %>
+    </ul>
+    <h4 class="mt-4">Bookings on my listings (<%= bookings.length %>)</h4>
+    <% if (bookings.length === 0) { %><p class="text-muted">No bookings yet.</p><% } %>
+    <% for (const b of bookings) { %>
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5><%= b.listing ? b.listing.title : "Listing removed" %></h5>
+          <p class="mb-1">Guest: <%= b.guest ? b.guest.username : "—" %> · <%= b.checkIn.toISOString().slice(0,10) %> → <%= b.checkOut.toISOString().slice(0,10) %> · <%= b.guests %> guest(s)</p>
+          <p class="mb-2">Total: ₹<%= b.totalPrice.toLocaleString("en-IN") %> · Status: <b><%= b.status %></b> · Payment: <%= b.paymentStatus %></p>
+          <% if (b.status === "pending") { %>
+            <form action="/bookings/<%= b._id %>/confirm" method="POST" class="d-inline"><button class="btn btn-sm btn-dark">Confirm</button></form>
+          <% } %>
+          <% if (b.status === "confirmed") { %>
+            <form action="/bookings/<%= b._id %>/complete" method="POST" class="d-inline"><button class="btn btn-sm btn-dark">Mark completed</button></form>
+          <% } %>
+          <% if (["pending", "confirmed"].includes(b.status)) { %>
+            <form action="/bookings/<%= b._id %>/cancel" method="POST" class="d-inline"><button class="btn btn-sm btn-outline-danger">Cancel</button></form>
+          <% } %>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</div>

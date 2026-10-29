@@ -5,34 +5,50 @@
         <form action="/listings" method="POST" class="needs-validation" novalidate enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="title" class="form-label">Title</label>
-                <input name="listing[title]"type="text" class="form-control" placeholder="Add a catchy title" required>
-                <div class="valid-feedback">Title looks good!</div>
+                <input name="listing[title]" type="text" class="form-control" placeholder="Add a catchy title" required>
             </div>
             <div class="mb-3">
                 <label for="description" class="form-label">Description</label>
                 <textarea name="listing[description]" class="form-control" required></textarea>
-                <div class="invalid-feedback">Please enter a short description</div>
             </div>
             <div class="mb-3">
-                <label for="image" class="form-label">Upload Listing Image</label>
-                <input name="listing[image]" type="file" class="form-control" required>
+                <label for="image" class="form-label">Upload Listing Image (Cloudinary, if configured)</label>
+                <input name="listing[image]" type="file" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label for="imageUrl" class="form-label">Or image URL</label>
+                <input name="listing[imageUrl]" type="url" class="form-control" placeholder="https://…">
+                <div class="form-text">If no file is uploaded and no URL is given, a placeholder image is used.</div>
             </div>
             <div class="row">
                 <div class="mb-3 col-md-4">
-                    <label for="price" class="form-label">Price</label>
-                    <input name="listing[price]" placeholder="1200" class="form-control" required>
-                    <div class="invalid-feedback">Price should be valid</div>
+                    <label for="price" class="form-label">Price (₹ / night)</label>
+                    <input name="listing[price]" placeholder="1200" type="number" min="0" class="form-control" required>
+                </div>
+                <div class="mb-3 col-md-4">
+                    <label for="guests" class="form-label">Max guests</label>
+                    <input name="listing[guests]" type="number" min="1" value="4" class="form-control">
+                </div>
+                <div class="mb-3 col-md-4">
+                    <label for="category" class="form-label">Category</label>
+                    <select name="listing[category]" class="form-select">
+                        <% for (const c of CATEGORIES) { %><option value="<%= c %>"><%= c %></option><% } %>
+                    </select>
                 </div>
                 <div class="mb-3 col-md-8">
                     <label for="country" class="form-label">Country</label>
                     <input name="listing[country]" placeholder="India" type="text" class="form-control" required>
-                    <div class="invalid-feedback">Country name should be valid</div>
                 </div>
             </div>
             <div class="mb-3">
                 <label for="location" class="form-label">Location</label>
                 <input name="listing[location]" placeholder="Jaipur, Rajasthan" type="text" class="form-control" required>
-                <div class="invalid-feedback">Location should be valid</div>
+            </div>
+            <div class="mb-3">
+                <span class="form-label d-block">Amenities</span>
+                <% for (const a of AMENITIES) { %>
+                    <label class="form-check form-check-inline"><input class="form-check-input" type="checkbox" name="listing[amenities]" value="<%= a %>"> <%= a %></label>
+                <% } %>
             </div>
             <button class="btn btn-dark my-3 add-btn">Add</button>
         </form>

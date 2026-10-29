@@ -1,0 +1,24 @@
+<% layout("/layouts/boilerplate") %>
+<div class="row mt-3">
+  <div class="col-8 offset-2">
+    <h3>My Wishlist</h3>
+    <% if (wishlist.length === 0) { %>
+      <p class="text-muted mt-3">Nothing saved yet. <a href="/listings">Browse listings</a> and save the ones you like.</p>
+    <% } %>
+    <div class="row g-4">
+      <% for (const l of wishlist) { %>
+        <div class="col-md-6">
+          <div class="card listing-card">
+            <img src="<%= l.image && l.image.url ? l.image.url : "" %>" class="card-img-top" alt="<%= l.title %>">
+            <div class="card-body">
+              <h6><%= l.location %>, <%= l.country %></h6>
+              <p class="title"><%= l.title %></p>
+              <p class="price">₹ <%= l.price.toLocaleString("en-IN") %> / night</p>
+              <a href="/listings/<%= l._id %>" class="btn btn-sm btn-dark">View</a>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+<% layout("/layouts/boilerplate") %>
+<div class="row mt-3">
+  <div class="col-10 offset-1">
+    <h3>Admin — Bookings</h3>
+    <% for (const b of bookings) { %>
+      <div class="card mb-3"><div class="card-body">
+        <h5><%= b.listing ? b.listing.title : "Listing removed" %></h5>
+        <p class="mb-1">Guest: <%= b.guest ? b.guest.username : "—" %> · Host: <%= b.host ? b.host.username : "—" %></p>
+        <p class="mb-2"><%= b.checkIn.toISOString().slice(0,10) %> → <%= b.checkOut.toISOString().slice(0,10) %> · ₹<%= b.totalPrice.toLocaleString("en-IN") %> · Status: <b><%= b.status %></b></p>
+        <% if (["pending", "confirmed"].includes(b.status)) { %>
+          <form action="/admin/bookings/<%= b._id %>/cancel" method="POST" class="d-inline"><button class="btn btn-sm btn-outline-danger">Cancel booking</button></form>
+        <% } %>
+      </div></div>
+    <% } %>
+    <% if (bookings.length === 0) { %><p class="text-muted">No bookings yet.</p><% } %>
+  </div>
+</div>
