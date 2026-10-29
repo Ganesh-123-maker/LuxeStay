@@ -37,7 +37,7 @@ module.exports.createBooking = async (req, res) => {
     await booking.save();
     req.flash(
         "success",
-        "Booking created (pending payment). Pay with Stripe from your Trips page when test keys are configured, or ask the host to confirm it."
+        "Booking created (pending payment). From Trips, use Demo payment if Stripe test keys are not configured — it is clearly labelled demo and takes no real money — or ask the host to confirm it."
     );
     res.redirect("/trips");
 };
@@ -84,7 +84,7 @@ module.exports.confirmBooking = async (req, res) => {
     }
     booking.status = "confirmed";
     await booking.save();
-    await sendBookingConfirmation({
+    const email = await sendBookingConfirmation({
         to: req.user.email,
         listingTitle: booking.listing ? booking.listing.title : "LuxeStay listing",
         checkIn: booking.checkIn.toISOString().slice(0, 10),
@@ -92,7 +92,12 @@ module.exports.confirmBooking = async (req, res) => {
         guests: booking.guests,
         total: booking.totalPrice,
     });
-    req.flash("success", "Booking confirmed.");
+    req.flash(
+        "success",
+        email.sent
+            ? "Booking confirmed. Confirmation email sent."
+            : "Booking confirmed. Email NOT sent (SMTP not configured) — the confirmation was logged to the console in dev/demo mode."
+    );
     res.redirect("/dashboard");
 };
 
@@ -130,7 +135,16 @@ module.exports.payBooking = async (req, res) => {
     const baseUrl = `${req.protocol}://${req.get("host")}`;
     const result = await createCheckoutSession(booking, booking.listing, baseUrl);
     if (!result.available) {
-        req.flash("error", `Stripe is not configured: ${result.reason} Booking stays pending.`);
+        // Demo mode (never a fake real payment): clearly labelled, no money
+        // moves, booking is confirmed with paymentStatus "demo".
+        booking.status = "confirmed";
+        booking.paymentStatus = "demo";
+        booking.stripeSessionId = "demo";
+        await booking.save();
+        req.flash(
+            "success",
+            "Demo mode — no real payment taken (Stripe test keys are not configured). Booking confirmed as a demo payment."
+        );
         return res.redirect("/trips");
     }
     booking.stripeSessionId = result.sessionId;

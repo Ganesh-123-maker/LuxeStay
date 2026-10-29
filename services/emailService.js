@@ -12,10 +12,10 @@ async function sendBookingConfirmation({ to, listingTitle, checkIn, checkOut, gu
         const text =
             `[email-dev] To: ${to} | Booking confirmed: ${listingTitle} ` +
             `${checkIn} -> ${checkOut}, ${guests} guest(s), total ₹${total}`;
-        if (process.env.NODE_ENV !== "production" && process.env.NODE_ENV !== "test") {
+        if (process.env.NODE_ENV !== "production") {
             console.log(text);
         }
-        return { sent: false, reason: "SMTP_NOT_CONFIGURED" };
+        return { sent: false, reason: "SMTP_NOT_CONFIGURED", logged: process.env.NODE_ENV !== "production" };
     }
     const nodemailer = require("nodemailer");
     const transporter = nodemailer.createTransport({

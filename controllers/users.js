@@ -80,8 +80,14 @@ module.exports.hostDashboard = async (req, res) => {
         .sort({ createdAt: -1 })
         .populate("listing")
         .populate("guest", "username");
-    const earnings = bookings
-        .filter((b) => ["confirmed", "completed"].includes(b.status))
+    // Real earnings count only actually-paid bookings. Demo payments are
+    // shown separately and never mixed into real earnings.
+    const paidBookings = bookings.filter(
+        (b) => ["confirmed", "completed"].includes(b.status) && b.paymentStatus === "paid"
+    );
+    const earnings = paidBookings.reduce((sum, b) => sum + b.totalPrice, 0);
+    const demoEarnings = bookings
+        .filter((b) => ["confirmed", "completed"].includes(b.status) && b.paymentStatus === "demo")
         .reduce((sum, b) => sum + b.totalPrice, 0);
-    res.render("dashboard/host.ejs", { listings, bookings, earnings });
+    res.render("dashboard/host.ejs", { listings, bookings, earnings, demoEarnings });
 };

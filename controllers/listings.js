@@ -67,8 +67,12 @@ module.exports.index = async (req, res) => {
         obj.avgRating = avgRating(d);
         return obj;
     });
+    const wishlistIds = new Set(
+        (req.user && req.user.wishlist ? req.user.wishlist : []).map((w) => w.toString())
+    );
     res.render("listings/index.ejs", {
         allListings,
+        wishlistIds,
         filters: { q: q || "", location: location || "", minPrice: minPrice || "", maxPrice: maxPrice || "", guests: guests || "", category: category || "", amenity: amenities, sort: sort || "newest" },
         page: safePage,
         totalPages,

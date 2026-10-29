@@ -18,7 +18,9 @@ const bookingSchema = new Schema(
         },
         paymentStatus: {
             type: String,
-            enum: ["pending", "paid", "refunded"],
+            // "demo" = demo-mode payment: clearly labelled, no real money moved.
+            // It is never counted as real paid earnings.
+            enum: ["pending", "paid", "demo", "refunded"],
             default: "pending",
         },
         stripeSessionId: { type: String, default: null },
