@@ -2,7 +2,7 @@
 
 A rental platform: browse listings, book stays, pay (Stripe test mode, or clearly-labelled demo payment when keys are missing), review completed stays, and manage listings as a host or moderator as an admin.
 
-**Live URL: TBD — not deployed yet.** This repo has not been pushed or deployed from this work; see [Deployment](#deployment) for the exact steps once accounts/keys are available.
+**Live URL: TBD — not publicly deployed yet.** The code has been pushed to GitHub (main @ `73b28f4`, CI green — see Verified below), but no public hosting is attached yet; see [Deployment](#deployment) for the exact steps once accounts/keys are available.
 
 ## Screenshots / GIF
 
@@ -174,7 +174,9 @@ Render is recommended because it is a long-lived server: no cold starts, no func
 
 - **Verified:** unit tests 11/11; integration flow 1/1 against in-memory MongoDB — signup, explicit logout + login, listing creation (image-URL fallback, no Cloudinary keys), search/filter + empty state, wishlist persistence, booking, double-booking rejection, demo payment (labelled, no real money), host complete, review after completed booking with computed ⭐ 5 average, second-booking cancellation, host dashboard, admin rejection for a non-admin, anonymous listing creation rejected to `/login`.
 - **Verified:** `node --check` on every JS file; fail-fast without `MONGO_URL`; Vercel entry returns a clean 500 without `MONGO_URL`; all 15 EJS templates render with mock data; mongo-sanitize strips `$where`; auth rate limiter returns 429 over its limit.
-- **Not verified:** real Stripe payment, real SMTP delivery, real Cloudinary upload, real Vercel/Render deploy, Docker build (no daemon here), Lighthouse scores (none measured, none claimed), mobile widths in a real browser (CSS is mobile-first and was rendered as HTML, but no live browser responsive check was run here).
+- **Verified — live local smoke test, 12/12 PASS (`scripts/smoke.sh`, `BASE_URL` defaults to `http://127.0.0.1:3000`):** run 2026-10-29 against a locally running server (mongod 8.2.6, seeded without `--reset`: 29 listings + 1 completed booking/review) — guest/host/admin login → 302, anonymous listing create → `/login`, non-admin `/admin` → 302, admin `/admin` → 200, listing creation with fallback image URL + search, booking 2 nights @ ₹1000 = ₹2,360 on `/trips` (₹2,000 + 18% GST), overlapping booking rejected (still 1 booking), demo payment badge shown (no Stripe keys), host dashboard with real vs demo earnings, review after completed booking appearing with ⭐ 5. Script exit code 0. This was a local live run only — public tunnels were blocked (localtunnel produced no URL, cloudflared not installed, localhost.run connection reset), so the live URL remains TBD.
+- **Verified — GitHub Actions CI, green:** run **40915172229** on `main` @ `73b28f4`, started 2026-10-29T16:48:26Z, job `test` (ID 123593362481) in 17s — `npm ci`, `npm test`, and `node --check` all passed. Warnings only: Node 20 deprecated on runners, `ubuntu-latest` migration notice. CI covers unit tests + syntax checks; the in-memory integration flow was verified locally, not in CI.
+- **Not verified:** real Stripe payment, real SMTP delivery, real Cloudinary upload, real Vercel/Render deploy (live URL TBD until public hosting is attached), Docker build (no daemon here), Lighthouse scores (none measured, none claimed), mobile widths in a real browser (CSS is mobile-first and was rendered as HTML, but no live browser responsive check was run here).
 - **No secrets were found in git history** in the audit (no `.env` or Atlas credential string in history diffs). The live risks fixed were the session-secret fallback and DB-URL logging — rotate `SESSION_SECRET` if it was ever shared.
 
 ## What I learned
