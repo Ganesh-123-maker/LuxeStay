@@ -1,0 +1,23 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      MONGO_URL: mongodb://mongo:27017/luxestay
+      SESSION_SECRET: ${SESSION_SECRET:-dev-only-secret-do-not-use-in-production}
+      CLOUD_NAME: ${CLOUD_NAME:-}
+      CLOUD_API_KEY: ${CLOUD_API_KEY:-}
+      CLOUD_API_SECRET: ${CLOUD_API_SECRET:-}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - luxestay-mongo:/data/db
+volumes:
+  luxestay-mongo:
